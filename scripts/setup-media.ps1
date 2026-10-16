@@ -11,6 +11,15 @@ function Test-Av1Decoder {
 if (-not $Rebuild) {
     & node $finalizer --verify --quiet
     if ($LASTEXITCODE -eq 0 -and (Test-Av1Decoder)) { Write-Host 'Verified media runtime with AV1 software decoding and corresponding sources is already installed.'; exit 0 }
+
+    $ffmpegCmd = Get-Command ffmpeg.exe -ErrorAction SilentlyContinue
+    $ffprobeCmd = Get-Command ffprobe.exe -ErrorAction SilentlyContinue
+    if ($ffmpegCmd -and $ffprobeCmd) {
+        Write-Host "Using local FFmpeg installation from PATH:"
+        Write-Host "  FFmpeg:  $($ffmpegCmd.Source)"
+        Write-Host "  FFprobe: $($ffprobeCmd.Source)"
+        exit 0
+    }
 }
 if (-not (Get-Command wsl.exe -ErrorAction SilentlyContinue)) {
     throw 'A verified media artifact or WSL Ubuntu 24.04 is required. See docs/media-build.md.'
